@@ -1,0 +1,24 @@
+# Dependencies
+**/node_modules/
+
+# Environment variables
+**/.env
+
+# Build files
+**/dist/
+**/build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+*.log
+
+# Testing
+coverage/
+*.test.js.snap
