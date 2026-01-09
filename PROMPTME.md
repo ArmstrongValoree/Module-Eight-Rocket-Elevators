@@ -381,13 +381,15 @@ If you want, I can walk you through adding Toastify to your current project or h
 
 ## ✏️ Prompt - 09
 
-**📎 Context:** Write what you were working on here
+**📎 Context:** Modal Components-Login/Agents/Transactions Pages
 
-Paste your prompt or question here
+I have to build a new agent  management page from scratch what is the most efficient way to build the pages and implement the modal components, build everything together or build the notification and modal components then apply them to the pages after they are built?
 
 ## 🤖 Response - 09
 
-Paste the AI's answer here
+Option A (Recommended): Build the notification and modal components today, then integrate them with actual functionality as we build login/agents/transactions in the coming days.
+
+Option B: Build everything from scratch including login and agent management (this would take more than one day).
 
 ---
 
