@@ -1,11 +1,13 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { useCookie } from 'react-use-cookie';
+import useCookie from 'react-use-cookie';
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  
+  // Correct usage of react-use-cookie
   const [sessionToken, setSessionToken] = useCookie('session_token', '');
 
   // Check for existing session on mount
@@ -18,7 +20,6 @@ export function AuthProvider({ children }) {
           console.log('Validating session token:', sessionToken);
           
           // Mock successful validation
-          // In Day 5, this will be: const response = await fetch('/api/validate_token?token=' + sessionToken)
           const mockUser = {
             id: '123',
             firstName: 'Demo',
@@ -43,7 +44,6 @@ export function AuthProvider({ children }) {
   const login = async (email, password) => {
     try {
       // TODO: Replace with real API call on Day 5
-      // For now, simulate login
       console.log('Logging in:', email);
       
       // Mock successful login
@@ -55,11 +55,8 @@ export function AuthProvider({ children }) {
         email: email
       };
 
-      setSessionToken(mockToken, { 
-        days: 1,  // 24 hour expiration
-        SameSite: 'Strict',
-        Secure: true
-      });
+      // Set cookie with token
+      setSessionToken(mockToken);
       setUser(mockUser);
       
       return { success: true };
