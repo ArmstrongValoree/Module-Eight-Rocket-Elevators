@@ -1,4 +1,3 @@
-// Import required packages
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -7,16 +6,15 @@ require('dotenv').config();
 
 const sessionRoutes = require('./routes/session');
 
-// Initialize Express app
 const app = express();
 
-// Middleware
+// Middleware - ORDER IS CRITICAL
 app.use(cors({
   origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
   credentials: true
 }));
-app.use(express.json()); // Parse JSON request bodies
-app.use(cookieParser()); // Parse cookies
+app.use(express.json());
+app.use(cookieParser());
 
 // Test route
 app.get('/', (req, res) => {
