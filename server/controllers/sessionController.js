@@ -2,12 +2,10 @@ const { v4: uuidv4 } = require('uuid');
 const Session = require('../models/Session');
 const User = require('../models/User');
 
-// POST /session - Create new session (login)
 exports.createSession = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validate input
     if (!email || !password) {
       return res.status(400).json({
         status: 'error',
@@ -16,7 +14,6 @@ exports.createSession = async (req, res) => {
       });
     }
 
-    // Find user by email
     const user = await User.findOne({ email: email.toLowerCase() });
 
     if (!user) {
@@ -27,7 +24,6 @@ exports.createSession = async (req, res) => {
       });
     }
 
-    // Check password (plain text comparison for demo - NOT production ready!)
     if (user.password !== password) {
       return res.status(401).json({
         status: 'error',
@@ -36,10 +32,8 @@ exports.createSession = async (req, res) => {
       });
     }
 
-    // Generate session token
     const sessionToken = uuidv4();
 
-    // Create session in database
     const session = new Session({
       session_token: sessionToken,
       user_id: user._id
@@ -47,7 +41,6 @@ exports.createSession = async (req, res) => {
 
     await session.save();
 
-    // Return success with token
     res.status(200).json({
       status: 'ok',
       data: {
@@ -72,12 +65,10 @@ exports.createSession = async (req, res) => {
   }
 };
 
-// GET /validate_token - Validate existing session
 exports.validateToken = async (req, res) => {
   try {
     const { token } = req.query;
 
-    // Validate input
     if (!token) {
       return res.status(400).json({
         status: 'error',
@@ -86,7 +77,6 @@ exports.validateToken = async (req, res) => {
       });
     }
 
-    // Find session in database
     const session = await Session.findOne({ session_token: token }).populate('user_id');
 
     if (!session) {
@@ -97,7 +87,6 @@ exports.validateToken = async (req, res) => {
       });
     }
 
-    // Return success with user info
     res.status(200).json({
       status: 'ok',
       data: {

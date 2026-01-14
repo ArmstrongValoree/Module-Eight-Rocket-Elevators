@@ -5,6 +5,8 @@ const cookieParser = require('cookie-parser');
 require('dotenv').config();
 
 const sessionRoutes = require('./routes/session');
+const transactionRoutes = require('./routes/transaction');
+const agentRoutes = require('./routes/agent');
 
 const app = express();
 
@@ -21,8 +23,10 @@ app.get('/', (req, res) => {
   res.json({ message: 'Welcome to Rocket Elevators API' });
 });
 
-// Session routes
+// Routes
 app.use('/session', sessionRoutes);
+app.use('/', transactionRoutes);
+app.use('/', agentRoutes);
 
 // MongoDB connection
 mongoose.connect(process.env.MONGODB_URI)
