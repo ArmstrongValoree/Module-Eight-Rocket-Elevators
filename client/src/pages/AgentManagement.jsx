@@ -311,7 +311,7 @@ function AgentManagement() {
               <div className="table-responsive">
                 <Table striped bordered hover>
                   <thead>
-                    <tr>
+                    <tr className="text-center">
                       <th>ID</th>
                       <th
                         onClick={() => handleSort("first_name")}
@@ -344,35 +344,33 @@ function AgentManagement() {
                       >
                         Fee{getSortIcon("fee")}
                       </th>
-                      <th style={{ width: "140px" }}>Actions</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredAgents.map((agent) => (
-                      <tr key={agent._id}>
+                      <tr key={agent._id} className="text-center">
                         <td>
                           <small className="text-muted font-monospace">
                             {agent._id}
                           </small>
                         </td>
                         <td>{agent.first_name}</td>
-                        <td className="fw-bold">{agent.last_name}</td>
+                        <td>{agent.last_name}</td>
                         <td>{agent.email}</td>
+                        <td>{agent.region}</td>
                         <td>
-                          <Badge bg={getRegionColor(agent.region)}>
-                            {agent.region}
-                          </Badge>
-                        </td>
-                        <td>
-                          <Badge bg={getRatingColor(agent.rating)}>
+                          <span
+                            className={`text-${getRatingColor(
+                              agent.rating
+                            )} fw-bold`}
+                          >
                             {agent.rating}%
-                          </Badge>
+                          </span>
                         </td>
-                        <td className="text-start">
-                          {formatCurrency(agent.fee)}
-                        </td>
+                        <td>{formatCurrency(agent.fee)}</td>
                         <td>
-                          <div className="d-flex gap-1">
+                          <div className="d-flex gap-1 justify-content-center">
                             <Button
                               variant="outline-secondary"
                               size="sm"
