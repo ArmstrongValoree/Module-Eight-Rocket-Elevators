@@ -1,40 +1,52 @@
-import { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Table, Spinner, Badge, Button, Form, InputGroup, Modal } from 'react-bootstrap';
-import Alert from '../components/Alert';
-import ConfirmationModal from '../components/ConfirmationModal';
+import { useState, useEffect } from "react";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Table,
+  Spinner,
+  Badge,
+  Button,
+  Form,
+  InputGroup,
+  Modal,
+} from "react-bootstrap";
+import Alert from "../components/Alert";
+import ConfirmationModal from "../components/ConfirmationModal";
 
 function AgentManagement() {
   const [agents, setAgents] = useState([]);
   const [filteredAgents, setFilteredAgents] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   // Search state
-  const [searchTerm, setSearchTerm] = useState('');
-  
+  const [searchTerm, setSearchTerm] = useState("");
+
   // Sort state
-  const [sortField, setSortField] = useState('last_name');
-  const [sortDirection, setSortDirection] = useState('asc');
-  
+  const [sortField, setSortField] = useState("last_name");
+  const [sortDirection, setSortDirection] = useState("asc");
+
   // Edit modal state
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingAgent, setEditingAgent] = useState(null);
   const [editForm, setEditForm] = useState({
-    first_name: '',
-    last_name: '',
-    email: '',
-    region: '',
-    rating: '',
-    fee: ''
+    first_name: "",
+    last_name: "",
+    email: "",
+    region: "",
+    rating: "",
+    fee: "",
   });
-  
+
   // Delete confirmation state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletingAgent, setDeletingAgent] = useState(null);
-  
+
   // Alert state
   const [showAlert, setShowAlert] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
-  const [alertVariant, setAlertVariant] = useState('success');
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertVariant, setAlertVariant] = useState("success");
 
   useEffect(() => {
     fetchAgents();
@@ -49,13 +61,13 @@ function AgentManagement() {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/agents`);
       const data = await response.json();
 
-      if (data.status === 'ok') {
+      if (data.status === "ok") {
         setAgents(data.data);
       }
     } catch (error) {
-      console.error('Error fetching agents:', error);
-      setAlertMessage('Failed to load agents');
-      setAlertVariant('danger');
+      console.error("Error fetching agents:", error);
+      setAlertMessage("Failed to load agents");
+      setAlertVariant("danger");
       setShowAlert(true);
     } finally {
       setLoading(false);
@@ -68,11 +80,12 @@ function AgentManagement() {
     // Filter by search term
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      result = result.filter(agent =>
-        agent._id.toLowerCase().includes(term) ||
-        agent.first_name.toLowerCase().includes(term) ||
-        agent.last_name.toLowerCase().includes(term) ||
-        agent.email.toLowerCase().includes(term)
+      result = result.filter(
+        (agent) =>
+          agent._id.toLowerCase().includes(term) ||
+          agent.first_name.toLowerCase().includes(term) ||
+          agent.last_name.toLowerCase().includes(term) ||
+          agent.email.toLowerCase().includes(term)
       );
     }
 
@@ -81,23 +94,23 @@ function AgentManagement() {
       let aValue, bValue;
 
       switch (sortField) {
-        case 'first_name':
+        case "first_name":
           aValue = a.first_name.toLowerCase();
           bValue = b.first_name.toLowerCase();
           break;
-        case 'last_name':
+        case "last_name":
           aValue = a.last_name.toLowerCase();
           bValue = b.last_name.toLowerCase();
           break;
-        case 'region':
+        case "region":
           aValue = a.region;
           bValue = b.region;
           break;
-        case 'rating':
+        case "rating":
           aValue = a.rating;
           bValue = b.rating;
           break;
-        case 'fee':
+        case "fee":
           aValue = a.fee;
           bValue = b.fee;
           break;
@@ -105,8 +118,8 @@ function AgentManagement() {
           return 0;
       }
 
-      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+      if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
+      if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
       return 0;
     });
 
@@ -115,16 +128,16 @@ function AgentManagement() {
 
   const handleSort = (field) => {
     if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
       setSortField(field);
-      setSortDirection('asc');
+      setSortDirection("asc");
     }
   };
 
   const getSortIcon = (field) => {
-    if (sortField !== field) return '↕️';
-    return sortDirection === 'asc' ? '↑' : '↓';
+    if (sortField !== field) return " ⬍";
+    return sortDirection === "asc" ? " ▲" : " ▼";
   };
 
   const handleEditClick = (agent) => {
@@ -135,7 +148,7 @@ function AgentManagement() {
       email: agent.email,
       region: agent.region,
       rating: agent.rating,
-      fee: agent.fee
+      fee: agent.fee,
     });
     setShowEditModal(true);
   };
@@ -144,31 +157,34 @@ function AgentManagement() {
     e.preventDefault();
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/agents/${editingAgent._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(editForm)
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/agents/${editingAgent._id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(editForm),
+        }
+      );
 
       const data = await response.json();
 
-      if (data.status === 'ok') {
-        setAlertMessage('Agent updated successfully!');
-        setAlertVariant('success');
+      if (data.status === "ok") {
+        setAlertMessage("Agent updated successfully!");
+        setAlertVariant("success");
         setShowAlert(true);
         setShowEditModal(false);
         fetchAgents();
       } else {
-        setAlertMessage(data.message || 'Failed to update agent');
-        setAlertVariant('danger');
+        setAlertMessage(data.message || "Failed to update agent");
+        setAlertVariant("danger");
         setShowAlert(true);
       }
     } catch (error) {
-      console.error('Error updating agent:', error);
-      setAlertMessage('Network error. Please try again.');
-      setAlertVariant('danger');
+      console.error("Error updating agent:", error);
+      setAlertMessage("Network error. Please try again.");
+      setAlertVariant("danger");
       setShowAlert(true);
     }
   };
@@ -182,51 +198,54 @@ function AgentManagement() {
     setShowDeleteModal(false);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/agents/${deletingAgent._id}`, {
-        method: 'DELETE'
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/agents/${deletingAgent._id}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       const data = await response.json();
 
-      if (data.status === 'ok') {
-        setAlertMessage('Agent deleted successfully!');
-        setAlertVariant('success');
+      if (data.status === "ok") {
+        setAlertMessage("Agent deleted successfully!");
+        setAlertVariant("success");
         setShowAlert(true);
         fetchAgents();
       } else {
-        setAlertMessage(data.message || 'Failed to delete agent');
-        setAlertVariant('danger');
+        setAlertMessage(data.message || "Failed to delete agent");
+        setAlertVariant("danger");
         setShowAlert(true);
       }
     } catch (error) {
-      console.error('Error deleting agent:', error);
-      setAlertMessage('Network error. Please try again.');
-      setAlertVariant('danger');
+      console.error("Error deleting agent:", error);
+      setAlertMessage("Network error. Please try again.");
+      setAlertVariant("danger");
       setShowAlert(true);
     }
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
     }).format(amount);
   };
 
   const getRegionColor = (region) => {
     const colors = {
-      'North': 'primary',
-      'South': 'success',
-      'East': 'warning',
-      'West': 'danger'
+      North: "primary",
+      South: "success",
+      East: "warning",
+      West: "danger",
     };
-    return colors[region] || 'secondary';
+    return colors[region] || "secondary";
   };
 
   const getRatingColor = (rating) => {
-    if (rating >= 90) return 'success';
-    if (rating >= 75) return 'warning';
-    return 'danger';
+    if (rating >= 90) return "success";
+    if (rating >= 75) return "warning";
+    return "danger";
   };
 
   return (
@@ -256,7 +275,10 @@ function AgentManagement() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                   {searchTerm && (
-                    <Button variant="outline-secondary" onClick={() => setSearchTerm('')}>
+                    <Button
+                      variant="outline-secondary"
+                      onClick={() => setSearchTerm("")}
+                    >
                       Clear
                     </Button>
                   )}
@@ -281,7 +303,9 @@ function AgentManagement() {
               </div>
             ) : filteredAgents.length === 0 ? (
               <p className="text-muted text-center py-5">
-                {searchTerm ? 'No agents match your search.' : 'No agents found.'}
+                {searchTerm
+                  ? "No agents match your search."
+                  : "No agents found."}
               </p>
             ) : (
               <div className="table-responsive">
@@ -289,46 +313,46 @@ function AgentManagement() {
                   <thead>
                     <tr>
                       <th>ID</th>
-                      <th 
-                        onClick={() => handleSort('first_name')}
-                        style={{ cursor: 'pointer' }}
+                      <th
+                        onClick={() => handleSort("first_name")}
+                        style={{ cursor: "pointer", userSelect: "none" }}
                       >
-                        First Name {getSortIcon('first_name')}
+                        First Name{getSortIcon("first_name")}
                       </th>
-                      <th 
-                        onClick={() => handleSort('last_name')}
-                        style={{ cursor: 'pointer' }}
+                      <th
+                        onClick={() => handleSort("last_name")}
+                        style={{ cursor: "pointer", userSelect: "none" }}
                       >
-                        Last Name {getSortIcon('last_name')}
+                        Last Name{getSortIcon("last_name")}
                       </th>
                       <th>Email</th>
-                      <th 
-                        onClick={() => handleSort('region')}
-                        style={{ cursor: 'pointer' }}
+                      <th
+                        onClick={() => handleSort("region")}
+                        style={{ cursor: "pointer", userSelect: "none" }}
                       >
-                        Region {getSortIcon('region')}
+                        Region{getSortIcon("region")}
                       </th>
-                      <th 
-                        onClick={() => handleSort('rating')}
-                        style={{ cursor: 'pointer' }}
+                      <th
+                        onClick={() => handleSort("rating")}
+                        style={{ cursor: "pointer", userSelect: "none" }}
                       >
-                        Rating {getSortIcon('rating')}
+                        Rating{getSortIcon("rating")}
                       </th>
-                      <th 
-                        onClick={() => handleSort('fee')}
-                        style={{ cursor: 'pointer' }}
+                      <th
+                        onClick={() => handleSort("fee")}
+                        style={{ cursor: "pointer", userSelect: "none" }}
                       >
-                        Fee {getSortIcon('fee')}
+                        Fee{getSortIcon("fee")}
                       </th>
-                      <th style={{ width: '120px' }}>Actions</th>
+                      <th style={{ width: "140px" }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredAgents.map(agent => (
+                    {filteredAgents.map((agent) => (
                       <tr key={agent._id}>
                         <td>
                           <small className="text-muted font-monospace">
-                            {agent._id.substring(0, 8)}...
+                            {agent._id}
                           </small>
                         </td>
                         <td>{agent.first_name}</td>
@@ -344,25 +368,28 @@ function AgentManagement() {
                             {agent.rating}%
                           </Badge>
                         </td>
-                        <td className="text-end">
+                        <td className="text-start">
                           {formatCurrency(agent.fee)}
                         </td>
                         <td>
-                          <Button
-                            variant="warning"
-                            size="sm"
-                            className="me-1"
-                            onClick={() => handleEditClick(agent)}
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            variant="danger"
-                            size="sm"
-                            onClick={() => handleDeleteClick(agent)}
-                          >
-                            Delete
-                          </Button>
+                          <div className="d-flex gap-1">
+                            <Button
+                              variant="outline-secondary"
+                              size="sm"
+                              onClick={() => handleEditClick(agent)}
+                              style={{ minWidth: "60px" }}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              variant="outline-secondary"
+                              size="sm"
+                              onClick={() => handleDeleteClick(agent)}
+                              style={{ minWidth: "60px" }}
+                            >
+                              Delete
+                            </Button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -387,7 +414,7 @@ function AgentManagement() {
             <Card className="text-center">
               <Card.Body>
                 <h3 className="text-success">
-                  {agents.filter(a => a.rating >= 90).length}
+                  {agents.filter((a) => a.rating >= 90).length}
                 </h3>
                 <p className="text-muted mb-0">High Rated (90+)</p>
               </Card.Body>
@@ -397,7 +424,10 @@ function AgentManagement() {
             <Card className="text-center">
               <Card.Body>
                 <h3 className="text-warning">
-                  {formatCurrency(agents.reduce((sum, a) => sum + a.fee, 0) / agents.length || 0)}
+                  {formatCurrency(
+                    agents.reduce((sum, a) => sum + a.fee, 0) / agents.length ||
+                      0
+                  )}
                 </h3>
                 <p className="text-muted mb-0">Average Fee</p>
               </Card.Body>
@@ -407,7 +437,7 @@ function AgentManagement() {
             <Card className="text-center">
               <Card.Body>
                 <h3 className="text-info">
-                  {new Set(agents.map(a => a.region)).size}
+                  {new Set(agents.map((a) => a.region)).size}
                 </h3>
                 <p className="text-muted mb-0">Regions Covered</p>
               </Card.Body>
@@ -417,7 +447,11 @@ function AgentManagement() {
       </Container>
 
       {/* Edit Modal */}
-      <Modal show={showEditModal} onHide={() => setShowEditModal(false)} centered>
+      <Modal
+        show={showEditModal}
+        onHide={() => setShowEditModal(false)}
+        centered
+      >
         <Modal.Header closeButton>
           <Modal.Title>Edit Agent</Modal.Title>
         </Modal.Header>
@@ -430,7 +464,9 @@ function AgentManagement() {
                   <Form.Control
                     type="text"
                     value={editForm.first_name}
-                    onChange={(e) => setEditForm({...editForm, first_name: e.target.value})}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, first_name: e.target.value })
+                    }
                     required
                   />
                 </Form.Group>
@@ -441,7 +477,9 @@ function AgentManagement() {
                   <Form.Control
                     type="text"
                     value={editForm.last_name}
-                    onChange={(e) => setEditForm({...editForm, last_name: e.target.value})}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, last_name: e.target.value })
+                    }
                     required
                   />
                 </Form.Group>
@@ -453,7 +491,9 @@ function AgentManagement() {
               <Form.Control
                 type="email"
                 value={editForm.email}
-                onChange={(e) => setEditForm({...editForm, email: e.target.value})}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, email: e.target.value })
+                }
                 required
               />
             </Form.Group>
@@ -464,7 +504,9 @@ function AgentManagement() {
                   <Form.Label>Region</Form.Label>
                   <Form.Select
                     value={editForm.region}
-                    onChange={(e) => setEditForm({...editForm, region: e.target.value})}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, region: e.target.value })
+                    }
                     required
                   >
                     <option value="North">North</option>
@@ -482,7 +524,12 @@ function AgentManagement() {
                     min="0"
                     max="100"
                     value={editForm.rating}
-                    onChange={(e) => setEditForm({...editForm, rating: parseInt(e.target.value)})}
+                    onChange={(e) =>
+                      setEditForm({
+                        ...editForm,
+                        rating: parseInt(e.target.value),
+                      })
+                    }
                     required
                   />
                 </Form.Group>
@@ -495,7 +542,12 @@ function AgentManagement() {
                     min="0"
                     step="1"
                     value={editForm.fee}
-                    onChange={(e) => setEditForm({...editForm, fee: parseInt(e.target.value)})}
+                    onChange={(e) =>
+                      setEditForm({
+                        ...editForm,
+                        fee: parseInt(e.target.value),
+                      })
+                    }
                     required
                   />
                 </Form.Group>
@@ -503,7 +555,10 @@ function AgentManagement() {
             </Row>
 
             <div className="d-flex justify-content-end gap-2">
-              <Button variant="secondary" onClick={() => setShowEditModal(false)}>
+              <Button
+                variant="secondary"
+                onClick={() => setShowEditModal(false)}
+              >
                 Cancel
               </Button>
               <Button variant="primary" type="submit">
@@ -524,7 +579,8 @@ function AgentManagement() {
             {deletingAgent && (
               <div className="bg-light p-3 rounded">
                 <p className="mb-1">
-                  <strong>Name:</strong> {deletingAgent.first_name} {deletingAgent.last_name}
+                  <strong>Name:</strong> {deletingAgent.first_name}{" "}
+                  {deletingAgent.last_name}
                 </p>
                 <p className="mb-0">
                   <strong>Email:</strong> {deletingAgent.email}
@@ -544,4 +600,3 @@ function AgentManagement() {
 }
 
 export default AgentManagement;
-
