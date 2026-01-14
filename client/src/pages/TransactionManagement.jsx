@@ -1,180 +1,187 @@
-import { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Form, Button, Table, Alert } from 'react-bootstrap';
-import { useAuth } from '../context/AuthContext';
-import ConfirmationModal from '../components/ConfirmationModal';
-import AlertComponent from '../components/Alert';
+import { useState, useEffect } from "react";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Form,
+  Button,
+  Table,
+  Spinner,
+} from "react-bootstrap";
+import { useAuth } from "../context/AuthContext";
+import Alert from "../components/Alert";
+import ConfirmationModal from "../components/ConfirmationModal";
 
 function TransactionManagement() {
-  const { isAuthenticated } = useAuth();
+  const { user } = useAuth();
   const [agents, setAgents] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+  const [submitting, setSubmitting] = useState(false);
+
   // Form state
-  const [amount, setAmount] = useState('');
-  const [selectedAgentId, setSelectedAgentId] = useState('');
-  
-  // Modal state
-  const [showModal, setShowModal] = useState(false);
-  
+  const [amount, setAmount] = useState("");
+  const [selectedAgentId, setSelectedAgentId] = useState("");
+
   // Alert state
   const [showAlert, setShowAlert] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
-  const [alertVariant, setAlertVariant] = useState('success');
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertVariant, setAlertVariant] = useState("success");
 
-  // Fetch agents and transactions on mount
+  // Modal state
+  const [showModal, setShowModal] = useState(false);
+
+  // Fetch agents and transactions on component mount
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchAgents();
-      fetchTransactions();
-    }
-  }, [isAuthenticated]);
+    fetchAgents();
+    fetchTransactions();
+  }, []);
 
-  // Fetch all agents for dropdown
   const fetchAgents = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/agents`, {
-        credentials: 'include'
-      });
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/agents`);
       const data = await response.json();
-      
-      if (data.status === 'ok') {
+
+      if (data.status === "ok") {
         setAgents(data.data);
       }
     } catch (error) {
-      console.error('Error fetching agents:', error);
-      showAlertMessage('Failed to load agents', 'danger');
+      console.error("Error fetching agents:", error);
     }
   };
 
-  // Fetch last 10 transactions
   const fetchTransactions = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/transaction-data`, {
-        credentials: 'include'
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/transaction-data`
+      );
       const data = await response.json();
-      
-      if (data.status === 'ok') {
+
+      if (data.status === "ok") {
         setTransactions(data.data);
       }
-      setLoading(false);
     } catch (error) {
-      console.error('Error fetching transactions:', error);
-      showAlertMessage('Failed to load transactions', 'danger');
+      console.error("Error fetching transactions:", error);
+    } finally {
       setLoading(false);
     }
   };
 
-  // Show alert helper
-  const showAlertMessage = (message, variant = 'success') => {
-    setAlertMessage(message);
-    setAlertVariant(variant);
-    setShowAlert(true);
-  };
-
-  // Handle form submit - show confirmation modal
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    // Validate form
-    if (!amount || !selectedAgentId) {
-      showAlertMessage('Please fill in all fields', 'danger');
+
+    // Validation - check empty fields FIRST
+    if (
+      !amount ||
+      amount.trim() === "" ||
+      !selectedAgentId ||
+      selectedAgentId === ""
+    ) {
+      setAlertMessage("Please fill in all fields");
+      setAlertVariant("danger");
+      setShowAlert(true);
       return;
     }
 
-    if (parseFloat(amount) <= 0) {
-      showAlertMessage('Amount must be a positive number', 'danger');
+    const numAmount = parseFloat(amount);
+
+    if (isNaN(numAmount) || numAmount <= 0) {
+      setAlertMessage("Amount must be a positive number");
+      setAlertVariant("danger");
+      setShowAlert(true);
       return;
     }
 
     // Show confirmation modal
     setShowModal(true);
   };
-
-  // Create transaction after confirmation
   const handleConfirmTransaction = async () => {
     setShowModal(false);
+    setSubmitting(true);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/transaction`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          amount: parseFloat(amount),
-          agent_id: selectedAgentId
-        })
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/transaction`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            amount: parseFloat(amount),
+            agent_id: selectedAgentId,
+          }),
+        }
+      );
 
       const data = await response.json();
 
-      if (data.status === 'ok') {
-        showAlertMessage('Transaction created successfully!', 'success');
-        
-        // Reset form
-        setAmount('');
-        setSelectedAgentId('');
-        
-        // Refresh transactions list
+      if (data.status === "ok") {
+        setAlertMessage("Transaction created successfully!");
+        setAlertVariant("success");
+        setShowAlert(true);
+
+        // Clear form
+        setAmount("");
+        setSelectedAgentId("");
+
+        // Refresh transactions
         fetchTransactions();
       } else {
-        showAlertMessage(data.message || 'Failed to create transaction', 'danger');
+        setAlertMessage(data.message || "Failed to create transaction");
+        setAlertVariant("danger");
+        setShowAlert(true);
       }
     } catch (error) {
-      console.error('Error creating transaction:', error);
-      showAlertMessage('Network error. Please try again.', 'danger');
+      console.error("Error creating transaction:", error);
+      setAlertMessage("Network error. Please try again.");
+      setAlertVariant("danger");
+      setShowAlert(true);
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  // Format date for display
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  // Format currency
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
     }).format(amount);
   };
 
-  if (!isAuthenticated) {
-    return null;
-  }
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const selectedAgent = agents.find((agent) => agent._id === selectedAgentId);
 
   return (
-    <Container className="mt-4">
-      <h1 className="mb-4">Transaction Management</h1>
-
-      {/* Alert */}
+    <Container className="py-4">
       {showAlert && (
-        <AlertComponent
+        <Alert
           message={alertMessage}
           variant={alertVariant}
           onClose={() => setShowAlert(false)}
         />
       )}
+      <h1 className="mb-4">Transaction Management</h1>
 
       <Row>
         {/* Transaction Form */}
         <Col md={4}>
-          <Card>
+          <Card className="mb-4">
             <Card.Body>
               <Card.Title>Create Transaction</Card.Title>
-              <Form onSubmit={handleSubmit}>
+              <Form onSubmit={handleSubmit} noValidate>
                 <Form.Group className="mb-3">
-                  <Form.Label>Amount</Form.Label>
+                  <Form.Label>Amount ($)</Form.Label>
                   <Form.Control
                     type="number"
                     step="0.01"
@@ -182,31 +189,45 @@ function TransactionManagement() {
                     placeholder="Enter amount"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
-                    required
+                    disabled={submitting}
                   />
-                  <Form.Text className="text-muted">
-                    Enter a positive dollar amount
-                  </Form.Text>
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                  <Form.Label>Agent</Form.Label>
+                  <Form.Label>Select Agent</Form.Label>
                   <Form.Select
                     value={selectedAgentId}
                     onChange={(e) => setSelectedAgentId(e.target.value)}
-                    required
+                    disabled={submitting}
                   >
-                    <option value="">Select an agent...</option>
+                    <option value="">Choose an agent...</option>
                     {agents.map((agent) => (
                       <option key={agent._id} value={agent._id}>
-                        {agent.first_name} {agent.last_name} - {agent.region}
+                        {agent._id} - {agent.first_name} {agent.last_name}
                       </option>
                     ))}
                   </Form.Select>
                 </Form.Group>
 
-                <Button variant="primary" type="submit" className="w-100">
-                  Create Transaction
+                <Button
+                  variant="primary"
+                  type="submit"
+                  className="w-100"
+                  disabled={submitting}
+                >
+                  {submitting ? (
+                    <>
+                      <Spinner
+                        as="span"
+                        animation="border"
+                        size="sm"
+                        className="me-2"
+                      />
+                      Creating...
+                    </>
+                  ) : (
+                    "Create Transaction"
+                  )}
                 </Button>
               </Form>
             </Card.Body>
@@ -218,50 +239,51 @@ function TransactionManagement() {
           <Card>
             <Card.Body>
               <Card.Title>Recent Transactions (Last 10)</Card.Title>
-              
+
               {loading ? (
-                <div className="text-center py-4">
-                  <div className="spinner-border text-primary" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                  </div>
+                <div className="text-center py-5">
+                  <Spinner animation="border" />
+                  <p className="mt-2">Loading transactions...</p>
                 </div>
               ) : transactions.length === 0 ? (
-                <p className="text-muted text-center py-4">
+                <p className="text-muted text-center py-5">
                   No transactions yet. Create your first transaction!
                 </p>
               ) : (
-                <Table striped bordered hover responsive>
-                  <thead>
-                    <tr>
-                      <th>Date</th>
-                      <th>Amount</th>
-                      <th>Agent</th>
-                      <th>Region</th>
-                      <th>Created By</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {transactions.map((transaction) => (
-                      <tr key={transaction._id}>
-                        <td>{formatDate(transaction.created_at)}</td>
-                        <td className="text-end fw-bold">
-                          {formatCurrency(transaction.amount)}
-                        </td>
-                        <td>
-                          {transaction.agent_id?.first_name} {transaction.agent_id?.last_name}
-                        </td>
-                        <td>
-                          <span className="badge bg-secondary">
-                            {transaction.agent_id?.region}
-                          </span>
-                        </td>
-                        <td>
-                          {transaction.user_id?.firstName} {transaction.user_id?.lastName}
-                        </td>
+                <div className="table-responsive">
+                  <Table striped bordered hover>
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Agent</th>
+                        <th>Created By</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </Table>
+                    </thead>
+                    <tbody>
+                      {transactions.map((transaction) => (
+                        <tr key={transaction._id}>
+                          <td>{formatDate(transaction.created_at)}</td>
+                          <td className="fw-bold">
+                            {formatCurrency(transaction.amount)}
+                          </td>
+                          <td>
+                            {transaction.agent_id.first_name}{" "}
+                            {transaction.agent_id.last_name}
+                            <br />
+                            <small className="text-muted">
+                              {transaction.agent_id.email}
+                            </small>
+                          </td>
+                          <td>
+                            {transaction.user_id.firstName}{" "}
+                            {transaction.user_id.lastName}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </div>
               )}
             </Card.Body>
           </Card>
@@ -272,7 +294,22 @@ function TransactionManagement() {
       <ConfirmationModal
         show={showModal}
         title="Confirm Transaction"
-        message={`Are you sure you want to create a transaction for ${formatCurrency(parseFloat(amount || 0))}?`}
+        message={
+          <>
+            <p>Are you sure you want to create this transaction?</p>
+            <div className="bg-light p-3 rounded">
+              <p className="mb-1">
+                <strong>Amount:</strong> {formatCurrency(amount || 0)}
+              </p>
+              {selectedAgent && (
+                <p className="mb-0">
+                  <strong>Agent:</strong> {selectedAgent.first_name}{" "}
+                  {selectedAgent.last_name} ({selectedAgent.email})
+                </p>
+              )}
+            </div>
+          </>
+        }
         onConfirm={handleConfirmTransaction}
         onCancel={() => setShowModal(false)}
       />

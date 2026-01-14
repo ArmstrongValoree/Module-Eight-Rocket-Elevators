@@ -15,7 +15,6 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         
-        {/* Protected Routes - Require Authentication */}
         <Route path="/" element={
           <ProtectedRoute>
             <Home />
@@ -34,7 +33,6 @@ function App() {
           </ProtectedRoute>
         } />
         
-        {/* Demo Routes - Public for testing */}
         <Route path="/alerts" element={<AlertDemo />} />
         <Route path="/modals" element={<ModalDemo />} />
       </Routes>

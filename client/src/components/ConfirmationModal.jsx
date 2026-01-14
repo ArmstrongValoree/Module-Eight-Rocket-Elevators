@@ -1,31 +1,20 @@
 import { Modal, Button } from 'react-bootstrap';
 
-function ConfirmationModal({ 
-  show, 
-  onClose, 
-  onConfirm, 
-  title = "Confirm Action",
-  message = "Are you sure you want to continue?",
-  confirmText = "Confirm",
-  cancelText = "Cancel",
-  confirmVariant = "primary"
-}) {
+function ConfirmationModal({ show, title, message, onConfirm, onCancel }) {
   return (
-    <Modal show={show} onHide={onClose} centered>
+    <Modal show={show} onHide={onCancel} centered>
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
-      
       <Modal.Body>
-        <p className="mb-0">{message}</p>
+        {message}
       </Modal.Body>
-      
       <Modal.Footer>
-        <Button variant="secondary" onClick={onClose}>
-          {cancelText}
+        <Button variant="secondary" onClick={onCancel}>
+          Cancel
         </Button>
-        <Button variant={confirmVariant} onClick={onConfirm}>
-          {confirmText}
+        <Button variant="primary" onClick={onConfirm}>
+          Confirm
         </Button>
       </Modal.Footer>
     </Modal>
