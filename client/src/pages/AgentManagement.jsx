@@ -136,8 +136,8 @@ function AgentManagement() {
   };
 
   const getSortIcon = (field) => {
-    if (sortField !== field) return " ⬍";
-    return sortDirection === "asc" ? " ▲" : " ▼";
+    if (sortField !== field) return " ↕";
+    return sortDirection === "asc" ? " ↑" : " ↓";
   };
 
   const handleEditClick = (agent) => {
