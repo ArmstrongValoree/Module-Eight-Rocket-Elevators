@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Agent = require('./models/Agent');
+const Agent = require('../models/Agent');
 require('dotenv').config();
 
 const agentsData = [
