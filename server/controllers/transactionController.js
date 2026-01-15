@@ -81,25 +81,22 @@ exports.createTransaction = async (req, res) => {
 };
 exports.getReportData = async (req, res) => {
   try {
-    // Get all transactions
-    const transactions = await Transaction
-      .find()
+    const allAgents = await Agent.find();
+    const transactions = await Transaction.find()
       .populate('agent_id', 'first_name last_name')
       .populate('user_id', 'firstName lastName');
 
-    // Calculate agent bar data - total transaction amount per agent
     const agentTotals = {};
+    allAgents.forEach(agent => {
+      agentTotals[`${agent.first_name} ${agent.last_name}`] = 0;
+    });
+
     transactions.forEach(transaction => {
-      // Skip transactions with deleted/invalid agents
-      if (!transaction.agent_id) {
-        return;
+      if (!transaction.agent_id) return;
+      const name = `${transaction.agent_id.first_name} ${transaction.agent_id.last_name}`;
+      if (agentTotals[name] !== undefined) {
+        agentTotals[name] += transaction.amount;
       }
-      
-      const agentName = `${transaction.agent_id.first_name} ${transaction.agent_id.last_name}`;
-      if (!agentTotals[agentName]) {
-        agentTotals[agentName] = 0;
-      }
-      agentTotals[agentName] += transaction.amount;
     });
 
     const agent_bar_data = Object.keys(agentTotals).map(name => ({
@@ -107,44 +104,29 @@ exports.getReportData = async (req, res) => {
       total: agentTotals[name]
     }));
 
-    // Calculate daily transaction totals for past 2 weeks
     const twoWeeksAgo = new Date();
     twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
-
-    const recentTransactions = transactions.filter(t => 
-      new Date(t.created_at) >= twoWeeksAgo
-    );
+    const recentTransactions = transactions.filter(t => new Date(t.created_at) >= twoWeeksAgo);
 
     const dailyTotals = {};
     recentTransactions.forEach(transaction => {
       const date = new Date(transaction.created_at).toISOString().split('T')[0];
-      if (!dailyTotals[date]) {
-        dailyTotals[date] = 0;
-      }
-      dailyTotals[date] += transaction.amount;
+      dailyTotals[date] = (dailyTotals[date] || 0) + transaction.amount;
     });
 
-    // Fill in missing dates with 0
     const transaction_line_data = [];
     for (let i = 13; i >= 0; i--) {
       const date = new Date();
       date.setDate(date.getDate() - i);
       const dateStr = date.toISOString().split('T')[0];
-      transaction_line_data.push({
-        date: dateStr,
-        total: dailyTotals[dateStr] || 0
-      });
+      transaction_line_data.push({ date: dateStr, total: dailyTotals[dateStr] || 0 });
     }
 
     res.status(200).json({
       status: 'ok',
-      data: {
-        agent_bar_data,
-        transaction_line_data
-      },
+      data: { agent_bar_data, transaction_line_data },
       message: null
     });
-
   } catch (error) {
     console.error('Get report data error:', error);
     res.status(500).json({
