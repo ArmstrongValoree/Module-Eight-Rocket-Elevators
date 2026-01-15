@@ -7,7 +7,7 @@ function Home() {
   const { user } = useAuth();
 
   return (
-    <Container className="py-4">
+    <Container fluid className="px-4 py-4">
       <h1 className="mb-4">Welcome, {user?.firstName}!</h1>
       <p className="lead mb-4">Select a management option below:</p>
 

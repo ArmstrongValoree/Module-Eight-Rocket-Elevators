@@ -163,7 +163,7 @@ function TransactionManagement() {
   const selectedAgent = agents.find((agent) => agent._id === selectedAgentId);
 
   return (
-    <Container className="py-4">
+    <Container fluid className="px-4 py-4">
       {showAlert && (
         <Alert
           message={alertMessage}
@@ -268,16 +268,18 @@ function TransactionManagement() {
                             {formatCurrency(transaction.amount)}
                           </td>
                           <td>
-                            {transaction.agent_id.first_name}{" "}
-                            {transaction.agent_id.last_name}
-                            <br />
-                            <small className="text-muted">
-                              {transaction.agent_id.email}
-                            </small>
-                          </td>
-                          <td>
-                            {transaction.user_id.firstName}{" "}
-                            {transaction.user_id.lastName}
+                            {transaction.agent_id ? (
+                              <>
+                                {transaction.agent_id.first_name}{" "}
+                                {transaction.agent_id.last_name}
+                                <br />
+                                <small className="text-muted">
+                                  {transaction.agent_id.email}
+                                </small>
+                              </>
+                            ) : (
+                              <span className="text-muted">Deleted Agent</span>
+                            )}
                           </td>
                         </tr>
                       ))}

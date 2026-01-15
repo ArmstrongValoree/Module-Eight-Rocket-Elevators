@@ -23,6 +23,17 @@ function AgentManagement() {
   // Search state
   const [searchTerm, setSearchTerm] = useState("");
 
+  // Create modal state
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [createForm, setCreateForm] = useState({
+    first_name: "",
+    last_name: "",
+    email: "",
+    region: "North",
+    rating: 80,
+    fee: 8000,
+  });
+
   // Sort state
   const [sortField, setSortField] = useState("last_name");
   const [sortDirection, setSortDirection] = useState("asc");
@@ -189,6 +200,51 @@ function AgentManagement() {
     }
   };
 
+  const handleCreateClick = () => {
+    setCreateForm({
+      first_name: "",
+      last_name: "",
+      email: "",
+      region: "North",
+      rating: 80,
+      fee: 8000,
+    });
+    setShowCreateModal(true);
+  };
+
+  const handleCreateSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/agents`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(createForm),
+      });
+
+      const data = await response.json();
+
+      if (data.status === "ok") {
+        setAlertMessage("Agent created successfully!");
+        setAlertVariant("success");
+        setShowAlert(true);
+        setShowCreateModal(false);
+        fetchAgents();
+      } else {
+        setAlertMessage(data.message || "Failed to create agent");
+        setAlertVariant("danger");
+        setShowAlert(true);
+      }
+    } catch (error) {
+      console.error("Error creating agent:", error);
+      setAlertMessage("Network error. Please try again.");
+      setAlertVariant("danger");
+      setShowAlert(true);
+    }
+  };
+
   const handleDeleteClick = (agent) => {
     setDeletingAgent(agent);
     setShowDeleteModal(true);
@@ -258,8 +314,13 @@ function AgentManagement() {
         />
       )}
 
-      <Container className="py-4">
-        <h1 className="mb-4">Agent Management</h1>
+      <Container fluid className="px-4 py-4">
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <h1 className="mb-0">Agent Management</h1>
+          <Button variant="primary" onClick={handleCreateClick}>
+            + Create New Agent
+          </Button>
+        </div>
 
         {/* Search and Controls */}
         <Card className="mb-4">
@@ -361,9 +422,7 @@ function AgentManagement() {
                         <td>{agent.region}</td>
                         <td>
                           <span
-                            className={`text-${getRatingColor(
-                              agent.rating
-                            )} fw-bold`}
+                            className={`text-${getRatingColor(agent.rating)}`}
                           >
                             {agent.rating}%
                           </span>
@@ -443,6 +502,135 @@ function AgentManagement() {
           </Col>
         </Row>
       </Container>
+
+      {/* Create Agent Modal */}
+      <Modal
+        show={showCreateModal}
+        onHide={() => setShowCreateModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Create New Agent</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form onSubmit={handleCreateSubmit}>
+            <Row>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>First Name</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={createForm.first_name}
+                    onChange={(e) =>
+                      setCreateForm({
+                        ...createForm,
+                        first_name: e.target.value,
+                      })
+                    }
+                    required
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Last Name</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={createForm.last_name}
+                    onChange={(e) =>
+                      setCreateForm({
+                        ...createForm,
+                        last_name: e.target.value,
+                      })
+                    }
+                    required
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Email</Form.Label>
+              <Form.Control
+                type="email"
+                value={createForm.email}
+                onChange={(e) =>
+                  setCreateForm({ ...createForm, email: e.target.value })
+                }
+                required
+              />
+            </Form.Group>
+
+            <Row>
+              <Col md={4}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Region</Form.Label>
+                  <Form.Select
+                    value={createForm.region}
+                    onChange={(e) =>
+                      setCreateForm({ ...createForm, region: e.target.value })
+                    }
+                    required
+                  >
+                    <option value="North">North</option>
+                    <option value="South">South</option>
+                    <option value="East">East</option>
+                    <option value="West">West</option>
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+              <Col md={4}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Rating (%)</Form.Label>
+                  <Form.Control
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={createForm.rating}
+                    onChange={(e) =>
+                      setCreateForm({
+                        ...createForm,
+                        rating: parseInt(e.target.value),
+                      })
+                    }
+                    required
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={4}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Fee ($)</Form.Label>
+                  <Form.Control
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={createForm.fee}
+                    onChange={(e) =>
+                      setCreateForm({
+                        ...createForm,
+                        fee: parseInt(e.target.value),
+                      })
+                    }
+                    required
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+
+            <div className="d-flex justify-content-end gap-2">
+              <Button
+                variant="secondary"
+                onClick={() => setShowCreateModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button variant="primary" type="submit">
+                Create Agent
+              </Button>
+            </div>
+          </Form>
+        </Modal.Body>
+      </Modal>
 
       {/* Edit Modal */}
       <Modal
