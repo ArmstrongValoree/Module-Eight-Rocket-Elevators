@@ -281,6 +281,16 @@ function TransactionManagement() {
                               <span className="text-muted">Deleted Agent</span>
                             )}
                           </td>
+                          <td>
+                            {transaction.user_id ? (
+                              <>
+                                {transaction.user_id.firstName}{" "}
+                                {transaction.user_id.lastName}
+                              </>
+                            ) : (
+                              <span className="text-muted">Unknown</span>
+                            )}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
