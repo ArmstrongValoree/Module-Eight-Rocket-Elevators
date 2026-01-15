@@ -7,7 +7,6 @@ import AlertDemo from "./pages/AlertDemo";
 import ModalDemo from "./pages/ModalDemo";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Reports from "./pages/Reports";
 
 function App() {
   return (
@@ -39,15 +38,6 @@ function App() {
           element={
             <ProtectedRoute>
               <TransactionManagement />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/reports"
-          element={
-            <ProtectedRoute>
-              <Reports />
             </ProtectedRoute>
           }
         />
