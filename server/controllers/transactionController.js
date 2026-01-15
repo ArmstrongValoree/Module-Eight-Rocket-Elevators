@@ -80,7 +80,7 @@ exports.createTransaction = async (req, res) => {
     }
   };
   
-  exports.deleteTransaction = async (req, res) => {
+exports.deleteTransaction = async (req, res) => {
   try {
     const { id } = req.params;
 
