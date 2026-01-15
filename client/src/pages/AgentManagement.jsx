@@ -30,8 +30,8 @@ function AgentManagement() {
     last_name: "",
     email: "",
     region: "North",
-    rating: 80,
-    fee: 8000,
+    rating: 0,
+    fee: 0,
   });
 
   // Sort state
@@ -206,12 +206,11 @@ function AgentManagement() {
       last_name: "",
       email: "",
       region: "North",
-      rating: 80,
-      fee: 8000,
+      rating: 0,
+      fee: 0,
     });
     setShowCreateModal(true);
   };
-
   const handleCreateSubmit = async (e) => {
     e.preventDefault();
 
