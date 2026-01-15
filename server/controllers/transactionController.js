@@ -72,10 +72,40 @@ exports.createTransaction = async (req, res) => {
     });
   } catch (error) {
     console.error("Create transaction error:", error);
+      res.status(500).json({
+        status: "error",
+        data: null,
+        message: "Failed to create transaction",
+      });
+    }
+  };
+  
+  exports.deleteTransaction = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const transaction = await Transaction.findByIdAndDelete(id);
+
+    if (!transaction) {
+      return res.status(404).json({
+        status: 'error',
+        data: null,
+        message: 'Transaction not found'
+      });
+    }
+
+    res.status(200).json({
+      status: 'ok',
+      data: transaction,
+      message: 'Transaction deleted successfully'
+    });
+
+  } catch (error) {
+    console.error('Delete transaction error:', error);
     res.status(500).json({
-      status: "error",
+      status: 'error',
       data: null,
-      message: "Failed to create transaction",
+      message: 'Failed to delete transaction'
     });
   }
 };

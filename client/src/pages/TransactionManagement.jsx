@@ -254,6 +254,7 @@ function TransactionManagement() {
                   <Table striped bordered hover>
                     <thead>
                       <tr>
+                        <th>ID</th>
                         <th>Date</th>
                         <th>Amount</th>
                         <th>Agent</th>
@@ -263,6 +264,11 @@ function TransactionManagement() {
                     <tbody>
                       {transactions.map((transaction) => (
                         <tr key={transaction._id}>
+                          <td>
+                            <small className="text-muted font-monospace">
+                              {transaction._id}
+                            </small>
+                          </td>
                           <td>{formatDate(transaction.created_at)}</td>
                           <td className="fw-bold">
                             {formatCurrency(transaction.amount)}
