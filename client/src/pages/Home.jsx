@@ -1,35 +1,66 @@
-import { Container, Row, Col } from 'react-bootstrap';
-import ManagementCard from '../components/ManagementCard';
+import { Container, Row, Col, Card } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 function Home() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
   return (
-    <Container className="mt-5">
-      <Row className="mb-4">
-        <Col>
-          <h1 className="text-center">Rocket Elevators Admin</h1>
-          <p className="text-center text-muted">
-            Select a management area to continue
-          </p>
+    <Container className="py-4">
+      <h1 className="mb-4">Welcome, {user?.firstName}!</h1>
+      <p className="lead mb-4">Select a management option below:</p>
+
+      <Row>
+        {/* Agent Management Card */}
+        <Col md={4} className="mb-4">
+          <Card 
+            className="h-100 shadow-sm hover-card"
+            onClick={() => navigate('/agents')}
+            style={{ cursor: 'pointer' }}
+          >
+            <Card.Body className="d-flex flex-column align-items-center justify-content-center text-center p-4">
+              <div className="display-1 mb-3">👥</div>
+              <Card.Title className="mb-2">Agent Management</Card.Title>
+              <Card.Text className="text-muted">
+                View, edit, search, and manage agents
+              </Card.Text>
+            </Card.Body>
+          </Card>
         </Col>
-      </Row>
-      
-      <Row className="g-4">
-        <Col md={6}>
-          <ManagementCard
-            title="Agent Management"
-            description="View, create, update, and delete agent information"
-            icon="👥"
-            link="/agents"
-          />
+
+        {/* Transaction Management Card */}
+        <Col md={4} className="mb-4">
+          <Card 
+            className="h-100 shadow-sm hover-card"
+            onClick={() => navigate('/transactions')}
+            style={{ cursor: 'pointer' }}
+          >
+            <Card.Body className="d-flex flex-column align-items-center justify-content-center text-center p-4">
+              <div className="display-1 mb-3">💰</div>
+              <Card.Title className="mb-2">Transaction Management</Card.Title>
+              <Card.Text className="text-muted">
+                Create and view transactions
+              </Card.Text>
+            </Card.Body>
+          </Card>
         </Col>
-        
-        <Col md={6}>
-          <ManagementCard
-            title="Transaction Management"
-            description="View recent transactions and create new transaction records"
-            icon="💰"
-            link="/transactions"
-          />
+
+        {/* Reports Dashboard Card */}
+        <Col md={4} className="mb-4">
+          <Card 
+            className="h-100 shadow-sm hover-card"
+            onClick={() => navigate('/reports')}
+            style={{ cursor: 'pointer' }}
+          >
+            <Card.Body className="d-flex flex-column align-items-center justify-content-center text-center p-4">
+              <div className="display-1 mb-3">📊</div>
+              <Card.Title className="mb-2">Reports Dashboard</Card.Title>
+              <Card.Text className="text-muted">
+                View transaction analytics and charts
+              </Card.Text>
+            </Card.Body>
+          </Card>
         </Col>
       </Row>
     </Container>
