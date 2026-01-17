@@ -34,6 +34,9 @@ function AgentManagement() {
     fee: 0,
   });
 
+  // Create confirmation modal state
+  const [showCreateConfirmModal, setShowCreateConfirmModal] = useState(false);
+
   // Sort state
   const [sortField, setSortField] = useState("last_name");
   const [sortDirection, setSortDirection] = useState("asc");
