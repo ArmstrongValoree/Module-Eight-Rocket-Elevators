@@ -214,15 +214,18 @@ function AgentManagement() {
     });
     setShowCreateModal(true);
   };
-  const handleCreateSubmit = async (e) => {
+  const handleCreateSubmit = (e) => {
     e.preventDefault();
+    setShowCreateConfirmModal(true); // show confirmation BEFORE creating
+  };
+
+  const handleCreateConfirm = async () => {
+    setShowCreateConfirmModal(false);
 
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/agents`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(createForm),
       });
 
@@ -258,9 +261,7 @@ function AgentManagement() {
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/agents/${deletingAgent._id}`,
-        {
-          method: "DELETE",
-        }
+        { method: "DELETE" }
       );
 
       const data = await response.json();
@@ -634,157 +635,186 @@ function AgentManagement() {
         </Modal.Body>
       </Modal>
 
-      {/* Edit Modal */}
-      <Modal
-        show={showEditModal}
-        onHide={() => setShowEditModal(false)}
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Edit Agent</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form onSubmit={handleEditSubmit}>
-            <Row>
-              <Col md={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>First Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    value={editForm.first_name}
-                    onChange={(e) =>
-                      setEditForm({ ...editForm, first_name: e.target.value })
-                    }
-                    required
-                  />
-                </Form.Group>
-              </Col>
-              <Col md={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Last Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    value={editForm.last_name}
-                    onChange={(e) =>
-                      setEditForm({ ...editForm, last_name: e.target.value })
-                    }
-                    required
-                  />
-                </Form.Group>
-              </Col>
-            </Row>
+     {/* Create Confirmation Modal */}
+<ConfirmationModal
+  show={showCreateConfirmModal}
+  title="Confirm Create Agent"
+  message={
+    <div className="modal-body p-0">
+      <p className="mb-3">Are you sure you want to create this agent?</p>
 
-            <Form.Group className="mb-3">
-              <Form.Label>Email</Form.Label>
-              <Form.Control
-                type="email"
-                value={editForm.email}
-                onChange={(e) =>
-                  setEditForm({ ...editForm, email: e.target.value })
-                }
-                required
-              />
-            </Form.Group>
+      <div className="bg-light p-3 rounded">
+        <p className="mb-2">
+          <span className="fw-bold">Name:</span> {createForm.first_name} {createForm.last_name}
+        </p>
+        <p className="mb-2">
+          <span className="fw-bold">Email:</span> {createForm.email}
+        </p>
+        <p className="mb-2">
+          <span className="fw-bold">Region:</span> {createForm.region}
+        </p>
+        <p className="mb-2">
+          <span className="fw-bold">Rating:</span> {createForm.rating}%
+        </p>
+        <p className="mb-0">
+          <span className="fw-bold">Fee:</span> ${createForm.fee}
+        </p>
+      </div>
+    </div>
+  }
+  onConfirm={handleCreateConfirm}
+  onCancel={() => setShowCreateConfirmModal(false)}
+/>
 
-            <Row>
-              <Col md={4}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Region</Form.Label>
-                  <Form.Select
-                    value={editForm.region}
-                    onChange={(e) =>
-                      setEditForm({ ...editForm, region: e.target.value })
-                    }
-                    required
-                  >
-                    <option value="North">North</option>
-                    <option value="South">South</option>
-                    <option value="East">East</option>
-                    <option value="West">West</option>
-                  </Form.Select>
-                </Form.Group>
-              </Col>
-              <Col md={4}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Rating (%)</Form.Label>
-                  <Form.Control
-                    type="number"
-                    min="0"
-                    max="100"
-                    value={editForm.rating}
-                    onChange={(e) =>
-                      setEditForm({
-                        ...editForm,
-                        rating: parseInt(e.target.value),
-                      })
-                    }
-                    required
-                  />
-                </Form.Group>
-              </Col>
-              <Col md={4}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Fee ($)</Form.Label>
-                  <Form.Control
-                    type="number"
-                    min="0"
-                    step="1"
-                    value={editForm.fee}
-                    onChange={(e) =>
-                      setEditForm({
-                        ...editForm,
-                        fee: parseInt(e.target.value),
-                      })
-                    }
-                    required
-                  />
-                </Form.Group>
-              </Col>
-            </Row>
+{/* Edit Modal */}
+<Modal show={showEditModal} onHide={() => setShowEditModal(false)} centered>
+  <Modal.Header closeButton>
+    <Modal.Title>Edit Agent</Modal.Title>
+  </Modal.Header>
 
-            <div className="d-flex justify-content-end gap-2">
-              <Button
-                variant="secondary"
-                onClick={() => setShowEditModal(false)}
-              >
-                Cancel
-              </Button>
-              <Button variant="primary" type="submit">
-                Save Changes
-              </Button>
-            </div>
-          </Form>
-        </Modal.Body>
-      </Modal>
+  <Modal.Body>
+    <Form onSubmit={handleEditSubmit}>
+      <Row>
+        <Col md={6}>
+          <Form.Group className="mb-3">
+            <Form.Label>First Name</Form.Label>
+            <Form.Control
+              type="text"
+              value={editForm.first_name}
+              onChange={(e) =>
+                setEditForm({ ...editForm, first_name: e.target.value })
+              }
+              required
+            />
+          </Form.Group>
+        </Col>
 
-      {/* Delete Confirmation Modal */}
-      <ConfirmationModal
-        show={showDeleteModal}
-        title="Delete Agent"
-        message={
-          <>
-            <p>Are you sure you want to delete this agent?</p>
-            {deletingAgent && (
-              <div className="bg-light p-3 rounded">
-                <p className="mb-1">
-                  <strong>Name:</strong> {deletingAgent.first_name}{" "}
-                  {deletingAgent.last_name}
-                </p>
-                <p className="mb-0">
-                  <strong>Email:</strong> {deletingAgent.email}
-                </p>
-              </div>
-            )}
-            <p className="text-danger mt-2 mb-0">
-              <strong>Warning:</strong> This action cannot be undone.
-            </p>
-          </>
-        }
-        onConfirm={handleDeleteConfirm}
-        onCancel={() => setShowDeleteModal(false)}
-      />
-    </>
-  );
-}
+        <Col md={6}>
+          <Form.Group className="mb-3">
+            <Form.Label>Last Name</Form.Label>
+            <Form.Control
+              type="text"
+              value={editForm.last_name}
+              onChange={(e) =>
+                setEditForm({ ...editForm, last_name: e.target.value })
+              }
+              required
+            />
+          </Form.Group>
+        </Col>
+      </Row>
+
+      <Form.Group className="mb-3">
+        <Form.Label>Email</Form.Label>
+        <Form.Control
+          type="email"
+          value={editForm.email}
+          onChange={(e) =>
+            setEditForm({ ...editForm, email: e.target.value })
+          }
+          required
+        />
+      </Form.Group>
+
+      <Row>
+        <Col md={4}>
+          <Form.Group className="mb-3">
+            <Form.Label>Region</Form.Label>
+            <Form.Select
+              value={editForm.region}
+              onChange={(e) =>
+                setEditForm({ ...editForm, region: e.target.value })
+              }
+              required
+            >
+              <option value="North">North</option>
+              <option value="South">South</option>
+              <option value="East">East</option>
+              <option value="West">West</option>
+            </Form.Select>
+          </Form.Group>
+        </Col>
+
+        <Col md={4}>
+          <Form.Group className="mb-3">
+            <Form.Label>Rating (%)</Form.Label>
+            <Form.Control
+              type="number"
+              min="0"
+              max="100"
+              value={editForm.rating}
+              onChange={(e) =>
+                setEditForm({
+                  ...editForm,
+                  rating: parseInt(e.target.value),
+                })
+              }
+              required
+            />
+          </Form.Group>
+        </Col>
+
+        <Col md={4}>
+          <Form.Group className="mb-3">
+            <Form.Label>Fee ($)</Form.Label>
+            <Form.Control
+              type="number"
+              min="0"
+              step="1"
+              value={editForm.fee}
+              onChange={(e) =>
+                setEditForm({
+                  ...editForm,
+                  fee: parseInt(e.target.value),
+                })
+              }
+              required
+            />
+          </Form.Group>
+        </Col>
+      </Row>
+
+      <div className="d-flex justify-content-end gap-2">
+        <Button variant="secondary" onClick={() => setShowEditModal(false)}>
+          Cancel
+        </Button>
+        <Button variant="primary" type="submit">
+          Save Changes
+        </Button>
+      </div>
+    </Form>
+  </Modal.Body>
+</Modal>
+
+{/* Delete Confirmation Modal */}
+<ConfirmationModal
+  show={showDeleteModal}
+  title="Delete Agent"
+  message={
+    <div className="modal-body p-0">
+      <p className="mb-3">Are you sure you want to delete this agent?</p>
+
+      {deletingAgent && (
+        <div className="bg-light p-3 rounded">
+          <p className="mb-2">
+            <span className="fw-bold">Name:</span> {deletingAgent.first_name} {deletingAgent.last_name}
+          </p>
+          <p className="mb-0">
+            <span className="fw-bold">Email:</span> {deletingAgent.email}
+          </p>
+        </div>
+      )}
+
+      <p className="text-danger mt-3 mb-0 fw-bold">
+        Warning: This action cannot be undone.
+      </p>
+    </div>
+  }
+  onConfirm={handleDeleteConfirm}
+  onCancel={() => setShowDeleteModal(false)}
+/>
 
 export default AgentManagement;
+    </>
+  );
+} 
