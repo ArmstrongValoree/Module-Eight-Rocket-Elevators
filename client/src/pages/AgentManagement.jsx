@@ -814,7 +814,9 @@ function AgentManagement() {
   onCancel={() => setShowDeleteModal(false)}
 />
 
-export default AgentManagement;
     </>
   );
-} 
+}
+
+export default AgentManagement;
+

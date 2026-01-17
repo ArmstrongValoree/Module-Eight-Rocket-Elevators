@@ -3,6 +3,10 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 require('dotenv').config();
+console.log('Loaded keys:', Object.keys(process.env));
+
+console.log('🔍 MONGODB_URI:', process.env.MONGODB_URI);
+
 
 const sessionRoutes = require('./routes/session');
 const transactionRoutes = require('./routes/transaction');
