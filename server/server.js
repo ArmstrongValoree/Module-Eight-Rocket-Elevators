@@ -34,8 +34,22 @@ app.use('/', transactionRoutes);
 app.use('/', agentRoutes);
 
 // MongoDB connection
+const User = require('./models/User');
+
 mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('✅ Connected to MongoDB'))
+  .then(async () => {
+    console.log('✅ Connected to MongoDB');
+    const existing = await User.findOne({ email: 'demo@rocketelevators.com' });
+    if (!existing) {
+      await User.create({
+        firstName: 'Demo',
+        lastName: 'User',
+        email: 'demo@rocketelevators.com',
+        password: 'password123'
+      });
+      console.log('✅ Demo user seeded');
+    }
+  })
   .catch((err) => console.error('❌ MongoDB connection error:', err));
 
 // Start server
