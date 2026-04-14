@@ -3,9 +3,6 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 require('dotenv').config();
-console.log('Loaded keys:', Object.keys(process.env));
-
-console.log('🔍 MONGODB_URI:', process.env.MONGODB_URI);
 
 
 const sessionRoutes = require('./routes/session');
@@ -15,8 +12,12 @@ const agentRoutes = require('./routes/agent');
 const app = express();
 
 // Middleware - ORDER IS CRITICAL
+const allowedOrigins = process.env.CLIENT_URL
+  ? [process.env.CLIENT_URL, 'http://localhost:5173']
+  : ['http://localhost:5173', 'http://127.0.0.1:5173'];
+
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+  origin: allowedOrigins,
   credentials: true
 }));
 app.use(express.json());
