@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcrypt');
 require('dotenv').config();
 
 
@@ -13,7 +14,7 @@ const app = express();
 
 // Middleware - ORDER IS CRITICAL
 const allowedOrigins = process.env.CLIENT_URL
-  ? [process.env.CLIENT_URL, 'http://localhost:5173']
+  ? [process.env.CLIENT_URL]
   : ['http://localhost:5173', 'http://127.0.0.1:5173'];
 
 app.use(cors({
@@ -41,11 +42,12 @@ mongoose.connect(process.env.MONGODB_URI)
     console.log('✅ Connected to MongoDB');
     const existing = await User.findOne({ email: 'demo@rocketelevators.com' });
     if (!existing) {
+      const hashed = await bcrypt.hash('password123', 10);
       await User.create({
         firstName: 'Demo',
         lastName: 'User',
         email: 'demo@rocketelevators.com',
-        password: 'password123'
+        password: hashed
       });
       console.log('✅ Demo user seeded');
     }

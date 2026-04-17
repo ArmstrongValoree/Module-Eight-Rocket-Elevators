@@ -71,6 +71,30 @@ VITE_API_URL=http://localhost:5000
 npm run dev
 ```
 
+## Live Demo
+
+Deployed on Render: https://module-eight-rocket-elevators.onrender.com/login
+
+**Demo credentials**
+- Email: `demo@rocketelevators.com`
+- Password: `password123`
+
+> Render free-tier services spin down after inactivity. The first request may take 30–60 seconds to wake up.
+
+## Portfolio Updates vs. Original Assignment
+
+This project was originally built as a Module 8 assignment focused on MERN stack fundamentals. The following changes were made for portfolio deployment:
+
+| Change | Why |
+|--------|-----|
+| Replaced plaintext password storage with **bcrypt hashing** | Passwords must never be stored in plaintext — this is a baseline production security requirement |
+| Added `bcrypt.compare` to session login | Consistent with the hash-on-create change above |
+| Removed hardcoded `localhost` from CORS fallback | In production `CLIENT_URL` is always set; the fallback was masking a misconfiguration |
+| Created `.env.example` for both server and client | Makes the repo usable by others without exposing real credentials |
+| Fixed `Alert` component to respect the `show` prop | The component always rendered regardless of state, causing a success toast to appear on every page load |
+| Created `client/.env.production` pointing to the Render API | The dev `.env` pointed to `localhost` — login silently failed in production |
+| Removed stale "Demo Mode" placeholder text from login page | Left over from early development; misleading in a production context |
+
 ## API Overview
 
 | Method | Route | Auth | Description |

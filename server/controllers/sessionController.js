@@ -1,4 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
+const bcrypt = require('bcrypt');
 const Session = require('../models/Session');
 const User = require('../models/User');
 
@@ -24,7 +25,8 @@ exports.createSession = async (req, res) => {
       });
     }
 
-    if (user.password !== password) {
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
       return res.status(401).json({
         status: 'error',
         data: null,
