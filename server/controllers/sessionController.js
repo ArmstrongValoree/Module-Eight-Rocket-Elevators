@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const Session = require('../models/Session');
 const User = require('../models/User');
 
