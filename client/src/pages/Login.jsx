@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, Form, Button, Card, Alert as BootstrapAlert } from 'react-bootstrap';
+import { Container, Form, Button, Card } from 'react-bootstrap';
 import { useAuth } from '../context/AuthContext';
 import Alert from '../components/Alert';
 
@@ -89,11 +89,6 @@ function Login() {
               </Button>
             </Form>
 
-            <div className="mt-4 p-3 bg-light rounded">
-              <p className="mb-2"><strong>Demo Mode:</strong></p>
-              <p className="mb-1 small text-muted">Enter any email and password to test</p>
-              <p className="mb-0 small text-muted">Real authentication will be connected on Day 5</p>
-            </div>
           </Card.Body>
         </Card>
       </div>

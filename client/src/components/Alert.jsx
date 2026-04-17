@@ -1,16 +1,18 @@
 import { Alert as BootstrapAlert } from 'react-bootstrap';
 import { useEffect } from 'react';
 
-function Alert({ message, variant = 'success', onClose, duration = 5000 }) {
+function Alert({ message, variant = 'success', show = false, onClose, duration = 5000 }) {
   useEffect(() => {
-    if (duration > 0) {
+    if (show && duration > 0) {
       const timer = setTimeout(() => {
         onClose();
       }, duration);
 
       return () => clearTimeout(timer);
     }
-  }, [duration, onClose]);
+  }, [show, duration, onClose]);
+
+  if (!show) return null;
 
   return (
     <div style={{
